@@ -1,37 +1,37 @@
 ---
-title: MÃ©thodes ApprochÃ©es pour la RÃ©solution de ProblÃ¨mes d'Ordonnancement
+title: Méthodes Approchées pour la Résolution de Problèmes d'Ordonnancement
 subtitle: Partie 1
 author: Arthur Bit-Monnot, Marie-Jo Huguet
 geometry: margin=3cm
 ...
 
-# Ã‰tapes de mise en place
+# Étapes de mise en place
 
 ## Discord
 
  - rejoignez le serveur Discord pour ces TP : [https://discord.gg/KyUbCCT](https://discord.gg/KyUbCCT). 
- - indiquez votre *PrÃ©nom Nom* comme pseudo, pour que l'on puisse vous identifier
- - en cas de problÃ¨me technique, vous pourrez vous adresser au chan *support-technique* de ce serveur.
+ - indiquez votre *Prénom Nom* comme pseudo, pour que l'on puisse vous identifier
+ - en cas de problème technique, vous pourrez vous adresser au chan *support-technique* de ce serveur.
  
 ## Document de suivi 
      
  - inscrivez vous dans le document de suivi : [https://docs.google.com/spreadsheets/d/1QAZlWaTCvrMlLLuwuVFmCD8Plr9QvOoPVpIR4g1PSBk/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1QAZlWaTCvrMlLLuwuVFmCD8Plr9QvOoPVpIR4g1PSBk/edit?usp=sharing)
- - Ã  chaque Ã©tape franchie dans le TP, ajountez un `X` dans la case correspondante 
+ - à chaque étape franchie dans le TP, ajountez un `X` dans la case correspondante 
  
-## RÃ©cuperation du code
+## Récuperation du code
 
-- RÃ©cupÃ©rez la base de code sur Github : [https://github.com/insa-4ir-meta-heuristiques/template-jobshop](https://github.com/insa-4ir-meta-heuristiques/template-jobshop)
+- Récupérez la base de code sur Github : [https://github.com/insa-4ir-meta-heuristiques/template-jobshop](https://github.com/insa-4ir-meta-heuristiques/template-jobshop)
 
 - Suivez les instructions dans le README pour vous assurer que le code compile.
-- Importez le projet dans votre IDE prÃ©fÃ©rÃ©. Tous doivent pouvoir supporter l'import de projet gradle et quelques liens sont donnÃ©s en bas du README. 
+- Importez le projet dans votre IDE préféré. Tous doivent pouvoir supporter l'import de projet gradle et quelques liens sont donnés en bas du README. 
 
  
 # Prise en main
 
-## ReprÃ©sentation d'un problÃ¨me de JobShop
+## Représentation d'un problème de JobShop
 
-Vous trouverez dans le dossier `instances/` un ensemble d'instances communÃ©ment utilisÃ©es pour le problÃ¨me de jobshop.
-Si l'on considÃ¨re l'instance vu dans les exercices, constituÃ©e de deux jobs avec trois tÃ¢ches chacun :
+Vous trouverez dans le dossier `instances/` un ensemble d'instances communément utilisées pour le problème de jobshop.
+Si l'on considère l'instance vu dans les exercices, constituée de deux jobs avec trois tâches chacun :
 
 \begin{table}[h!]
  	\centering
@@ -43,7 +43,7 @@ Si l'on considÃ¨re l'instance vu dans les exercices, constituÃ©e de deux jobs av
  	\label{tab:tache}
  \end{table}
  
-L'instance est nommÃ©e `aaa1` dÃ©crite ci-dessus est donnÃ©e dans le fichier `instances/aaa1` :
+L'instance est nommée `aaa1` décrite ci-dessus est donnée dans le fichier `instances/aaa1` :
 
 ```
     # Fichier instances/aaa1
@@ -52,50 +52,50 @@ L'instance est nommÃ©e `aaa1` dÃ©crite ci-dessus est donnÃ©e dans le fichier `in
     1 2 0 2 2 4 # Job 2 : (machine duration) for each task 
 ```
 
-La premiÃ¨re ligne donnÃ©e le nombre de jobs et le nombre de tÃ¢ches par jobs. Le nombre de machine est Ã©gal au nombre de tÃ¢ches.
-Chacune des lignes suivantes spÃ©cifie la machine (ici numÃ©rotÃ©es `0`, `1` et `2`) et la durÃ©e de chaque tÃ¢che. Par exemple la ligne
-`0 3 1 3 2 2` spÃ©cifie que pour le premier job :
+La première ligne donnée le nombre de jobs et le nombre de tâches par jobs. Le nombre de machine est égal au nombre de tâches.
+Chacune des lignes suivantes spécifie la machine (ici numérotées `0`, `1` et `2`) et la durée de chaque tâche. Par exemple la ligne
+`0 3 1 3 2 2` spécifie que pour le premier job :
 
- - `0 3`: la premiÃ¨re tÃ¢che s'execute sur la machine `0` et dure `3` unitÃ©s de temps
- - `1 3`: la deuxiÃ¨me tÃ¢che s'execute sur la machine `1` et dure `3` unitÃ©s de temps
- - `2 2`: la troisiÃ¨me tÃ¢che s'execute sur la machine `2` et dure `2` unitÃ©s de temps
+ - `0 3`: la première tâche s'execute sur la machine `0` et dure `3` unités de temps
+ - `1 3`: la deuxième tâche s'execute sur la machine `1` et dure `3` unités de temps
+ - `2 2`: la troisième tâche s'execute sur la machine `2` et dure `2` unités de temps
 
  
 ## Base de code
 
-Il vous est fourni une base de code pour faciliter votre prise en main du problÃ¨me.
-Vous trouverez dans la classe `jobshop.Main` un point d'entrÃ©e pour rÃ©aliser des tests de performance de mÃ©thodes heuristiques.
-Les autres points d'entrÃ©e du programme sont les tests dÃ©jÃ  prÃ©sent ou pouvant Ãªtre ajoutÃ©s dans le dossier `src/test/java/`. 
+Il vous est fourni une base de code pour faciliter votre prise en main du problème.
+Vous trouverez dans la classe `jobshop.Main` un point d'entrée pour réaliser des tests de performance de méthodes heuristiques.
+Les autres points d'entrée du programme sont les tests déjà présent ou pouvant être ajoutés dans le dossier `src/test/java/`. 
 
-### ProblÃ¨me et Solution
+### Problème et Solution
  
- - classe `jobshop.Instance` qui contient la reprÃ©sentation d'un problÃ¨me et une mÃ©thode pour parser un fichier de problÃ¨me.
- - classe `jobshop.Schedule` qui contient la reprÃ©sentation directe, associant Ã  chaque tÃ¢che une date de dÃ©but.
- La classe schedule sert notamment Ã  la reprÃ©sentation d'une solution et toute autre reprÃ©sentation doit pouvoir Ãªtre traduite dans un `Schedule`
+ - classe `jobshop.Instance` qui contient la représentation d'un problème et une méthode pour parser un fichier de problème.
+ - classe `jobshop.Schedule` qui contient la représentation directe, associant à chaque tâche une date de début.
+ La classe schedule sert notamment à la représentation d'une solution et toute autre représentation doit pouvoir être traduite dans un `Schedule`
  
-### ReprÃ©sentation 
+### Représentation 
  
- - une classe abstraite `jobshop.Encoding` dont les sous classes sont des reprÃ©sentations d'une solution au JobShop. 
- - une classe `jobshop.encoding.NumJobs` qui contient une implÃ©mentation de la reprÃ©sentation par numÃ©ro de job
+ - une classe abstraite `jobshop.Encoding` dont les sous classes sont des représentations d'une solution au JobShop. 
+ - une classe `jobshop.encoding.NumJobs` qui contient une implémentation de la représentation par numéro de job
  
 ### Solveurs
 
-Deux solveurs trÃ¨s simples basÃ©s sur une reprÃ©sentation par numÃ©ro de job. Les nouveaux solveurs doivent Ãªtre ajoutÃ©s Ã  la structure `jobshop.Main.solvers` pour Ãªtre accessibles dans le programme principal.
+Deux solveurs très simples basés sur une représentation par numéro de job. Les nouveaux solveurs doivent être ajoutés à la structure `jobshop.Main.solvers` pour être accessibles dans le programme principal.
  
- - `basic` : mÃ©thode pour la gÃ©nÃ©ration d'une solution pour une reprÃ©sentation par numÃ©ro de job
- - `random` : mÃ©thode de gÃ©nÃ©ration de solutions alÃ©atoires par numÃ©ro de job
+ - `basic` : méthode pour la génération d'une solution pour une représentation par numéro de job
+ - `random` : méthode de génération de solutions aléatoires par numéro de job
 
 
 
-## Ã€ faire : manipulation de reprÃ©sentations
+## À faire : manipulation de représentations
 
-Ouvrez la mÃ©thode `DebuggingMain.main()`. 
+Ouvrez la méthode `DebuggingMain.main()`. 
 
  - Pour la solutions en représentation par numéro de job donnée, calculez (à la main) les dates de début de chaque tâche
  - implémentez la méthode `toString()` de la classe `Schedule` pour afficher les dates de début de chaque tâche dans un schedule.
- - VÃ©rifiez que ceci correspond bien aux calculs que vous aviez fait Ã  la main.
+ - Vérifiez que ceci correspond bien aux calculs que vous aviez fait à la main.
  
-CrÃ©ation d'une nouvelle representation par ordre de passage sur les ressources : 
+Création d'une nouvelle representation par ordre de passage sur les ressources : 
 
 - Créer une classe `jobshop.encodings.ResourceOrder` qui contient la représentation par ordre de passage sur ressources vue dans les exercices (section 3.2). Il s'agit ici d'une reprsentation sous forme de matrice où chaque ligne correspond à une machine, et sur cette ligne se trouvent les tâches qui s'exécutent dessus dans leur ordre de passage. Pour la representation d'une tâche dans la matrice, vous pouvez utiliser la classe `jobshop.encodings.Task` qui vous est fournie.
 
@@ -106,77 +106,78 @@ Pour construire ce schedule il faudra que vous mainteniez une liste des tâches q
 
      - son prédecesseur sur le job a été schedulé (si c'est la tache (1, 3), il faut que les tâches (1,1) et (1,2) aient été schédulée)
      - son prédecesseur sur la ressource a été schedulé (l'ordre sur passage sur les ressources est précisement ce qui vous est donné par cette représentation).
-
+ 
 - Ajouter des tests dans `src/test/java/jobshop` permettant de vérifier que vos méthodes fonctionnent bien pour les exemples traités en cours (instance `aaa1`). Vous pouvez pour cela vous inspirer et ajouter des cas de test à `EncodingTests`. 
 
 
-Changement de reprÃ©sentation : 
 
-- pour les deux reprÃ©sentations `ResourceOrder` et `JobNums`, crÃ©ez des mÃ©thodes permettant de crÃ©er cette reprÃ©sentation depuis un `Schedule`.
-- utilisez lÃ  pour tester la conversion de `ResourceOrder` vers `JobNums` et vice-versa.
+Changement de représentation : 
+
+- pour les deux représentations `ResourceOrder` et `JobNums`, créez des méthodes permettant de créer cette représentation depuis un `Schedule`.
+- utilisez la pour tester la conversion de `ResourceOrder` vers `JobNums` et vice-versa.
 
 
 # Heuristiques gloutonne
 
-Un schÃ©ma gÃ©nÃ©ral d'heuristique est prÃ©sentÃ© dans l'article [@Blazewicz1996] et est rÃ©sumÃ© ci-dessous:
+Un schéma général d'heuristique est présenté dans l'article [@Blazewicz1996] et est résumé ci-dessous:
 
- #. se placer Ã  une date $t$ Ã©gale Ã  la plus petite date de dÃ©but des opÃ©rations 
- #. construire l'ensemble des opÃ©rations pouvant Ãªtre rÃ©alisÃ©es Ã  la date $t$
- #. sÃ©lectionner l'operation $(i,j)$ rÃ©alisable de plus grande prioritÃ©
- #. placer $(i,j)$ au plus tÃ´t sur la ressource $k$ qui la rÃ©alise (en respectant les contraintes de partage de ressources, c'est Ã  dire en vÃ©rifiant la date de disponibilitÃ© de la ressource $k$)
- #. recommencer en (3) tant qu'il reste des opÃ©rations Ã  ordonnancer 
- #. recommencer en (2) en incrÃ©mentant la date $t$ (Ã  la prochaine date possible compte tenu des dates de dÃ©but des opÃ©rations)
+ #. se placer à une date $t$ égale à la plus petite date de début des opérations 
+ #. construire l'ensemble des opérations pouvant être réalisées à la date $t$
+ #. sélectionner l'operation $(i,j)$ réalisable de plus grande priorité
+ #. placer $(i,j)$ au plus tôt sur la ressource $k$ qui la réalise (en respectant les contraintes de partage de ressources, c'est à dire en vérifiant la date de disponibilité de la ressource $k$)
+ #. recommencer en (3) tant qu'il reste des opérations à ordonnancer 
+ #. recommencer en (2) en incrémentant la date $t$ (à la prochaine date possible compte tenu des dates de début des opérations)
 
 
-Selon la maniÃ¨re dont sont gÃ©rÃ©es les prioritÃ©s entre les opÃ©rations on obtient diffÃ©rentes solutions d'ordonnancement. Les rÃ¨gles de pioritÃ© classiquement utilisÃ©es sont : 
+Selon la manière dont sont gérées les priorités entre les opérations on obtient différentes solutions d'ordonnancement. Les règles de piorité classiquement utilisées sont : 
 
- - SPT (Shortest Processing Time) : donne la prioritÃ© Ã  la tÃ¢che ayant la plus petite durÃ©e;
- - LPT (Longest Processing Time) : donne la prioritÃ© Ã  la tÃ¢che ayant la plus grande durÃ©e 
+ - SPT (Shortest Processing Time) : donne la priorité à la tâche ayant la plus petite durée;
+ - LPT (Longest Processing Time) : donne la priorité à la tâche ayant la plus grande durée 
 
-## Ã€ faire
+## À faire
 
- - CrÃ©er un nouveau solveur implÃ©mentant une recherche gloutonne pour les prioritÃ©s SPT et LPT, basÃ© sur la reprÃ©sentation par ordre de passage sur les ressources
- - Evaluer ces heuristiques sur les instances fournies et pour la mÃ©trique d'Ã©cart fournie.
- - (optionnel) Concevoir une version randomisÃ©e de ces heuristiques oÃ¹ une partie des choix est soumise Ã  un tirage alÃ©atoire
- - DÃ©buter la rÃ©daction d'un rapport prÃ©sentant le travail effectuÃ©
+ - Créer un nouveau solveur implémentant une recherche gloutonne pour les priorités SPT et LPT, basé sur la représentation par ordre de passage sur les ressources
+ - Evaluer ces heuristiques sur les instances fournies et pour la métrique d'écart fournie.
+ - (optionnel) Concevoir une version randomisée de ces heuristiques où une partie des choix est soumise à un tirage aléatoire
+ - Débuter la rédaction d'un rapport présentant le travail effectué
 
-Pour les tests de performance, on privilÃ©giera les instance `ft06`, `ft10`, `ft20` et les instances de Lawrence `la01` Ã  `la40`.
+Pour les tests de performance, on privilégiera les instance `ft06`, `ft10`, `ft20` et les instances de Lawrence `la01` à `la40`.
 
 <!--
- - Concevoir version *randomisÃ©e* de ces recherches gloutonnes
- - Evaluer cette nouvelle heuristique sur les instances fournies et pour les mÃ©triques dÃ©finies prÃ©cÃ©demment
- - Comparer les rÃ©sultats obtenus par ces deux heuristiques par rapport Ã  ceux de la littÃ©rature et Ã  la mÃ©thode exacte
- - DÃ©buter la rÃ©daction d'un rapport prÃ©sentant le travail effectuÃ©
+ - Concevoir version *randomisée* de ces recherches gloutonnes
+ - Evaluer cette nouvelle heuristique sur les instances fournies et pour les métriques définies précédemment
+ - Comparer les résultats obtenus par ces deux heuristiques par rapport à ceux de la littérature et à la méthode exacte
+ - Débuter la rédaction d'un rapport présentant le travail effectué
 -->
 
 # Recherche exhaustive
 
-Dans le but de garantir l'optimalitÃ© des solutions trouvÃ©e, implÃ©mentez une recherche exhaustive basÃ©e sur une recherche en profondeur d'abord (Depth-First Search).  
-On notera que par rapport Ã  la mÃ©thode gloutonne, une recherche exhaustive doit permettre de tester l'ensemble des opÃ©rations pouvant Ãªtre rÃ©alisÃ©e Ã  instant $t$ (Ã©tape (2) de la mÃ©thode gloutonne ci-dessus).
-On ne cherchera pas Ã  optimiser cette mÃ©thode, des techniques plus adaptÃ©es Ã  la recherche exhaustive pour de tels problÃ¨mes seront traitÃ©es en 5Ã¨me annÃ©e.
+Dans le but de garantir l'optimalité des solutions trouvée, implémentez une recherche exhaustive basée sur une recherche en profondeur d'abord (Depth-First Search).  
+On notera que par rapport à la méthode gloutonne, une recherche exhaustive doit permettre de tester l'ensemble des opérations pouvant être réalisée à instant $t$ (étape (2) de la méthode gloutonne ci-dessus).
+On ne cherchera pas à optimiser cette méthode, des techniques plus adaptées à la recherche exhaustive pour de tels problèmes seront traitées en 5ème année.
 
-Quelle semble Ãªtre la taille limite d'une instance pour permettre une recherche exhaustive ?
+Quelle semble être la taille limite d'une instance pour permettre une recherche exhaustive ?
 
-# RÃ©fÃ©rences 
+# Références 
 
 <!--
-# MÃ©thode de descente
+# Méthode de descente
 
-- implÃ©menter chemin critique
-- mÃ©thode de validation
+- implémenter chemin critique
+- méthode de validation
 
-- implÃ©menter voisinage 
+- implémenter voisinage 
    - Laarhoven
    - Nowicki et Smutnicki (optionnel)
 
-- mÃ©thode descente 
+- méthode descente 
 
-- mÃ©thode de descente avec dÃ©part multiples (optionnel)
+- méthode de descente avec départ multiples (optionnel)
 
 
-# MÃ©taheuristiques
+# Métaheuristiques
 
-Au choix : MÃ©thode tabou ou Algorithme gÃ©nÃ©tique
+Au choix : Méthode tabou ou Algorithme génétique
 
 
 
