@@ -6,10 +6,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 
-
-import jobshop.solvers.BasicSolver;
-import jobshop.solvers.RandomSolver;
+import jobshop.solvers.*;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
@@ -24,7 +23,12 @@ public class Main {
         solvers = new HashMap<>();
         solvers.put("basic", new BasicSolver());
         solvers.put("random", new RandomSolver());
-        // add new solvers here
+        solvers.put("spt", new GreedySolver(GreedySolver.Priority.SPT));
+        solvers.put("lpt", new GreedySolver(GreedySolver.Priority.LPT));
+        solvers.put("srpt", new GreedySolver(GreedySolver.Priority.SRPT));
+        solvers.put("lrpt", new GreedySolver(GreedySolver.Priority.LRPT));
+        solvers.put("est_lrpt", new GreedySolver(GreedySolver.Priority.EST_LRPT));
+        solvers.put("est_spt", new GreedySolver(GreedySolver.Priority.EST_SPT));
     }
 
 
@@ -68,20 +72,23 @@ public class Main {
                 System.exit(1);
             }
         }
-        List<String> instances = ns.<String>getList("instance");
-        for(String instanceName : instances) {
-            if(!BestKnownResult.isKnown(instanceName)) {
-                System.err.println("ERROR: instance \"" + instanceName + "\" is not avalaible.");
+        List<String> instancePrefixes = ns.getList("instance");
+        List<String> instances = new ArrayList<>();
+        for(String instancePrefix : instancePrefixes) {
+            List<String> matches = BestKnownResult.instancesMatching(instancePrefix);
+            if(matches.isEmpty()) {
+                System.err.println("ERROR: instance prefix \"" + instancePrefix + "\" does not match any instance.");
                 System.err.println("       available instances: " + Arrays.toString(BestKnownResult.instances));
                 System.exit(1);
             }
+            instances.addAll(matches);
         }
 
         float[] runtimes = new float[solversToTest.size()];
         float[] distances = new float[solversToTest.size()];
 
         try {
-            output.print(  "                         ");;
+            output.print(  "                         ");
             for(String s : solversToTest)
                 output.printf("%-30s", s);
             output.println();
@@ -92,46 +99,43 @@ public class Main {
             output.println();
 
 
-        for(String instanceName : instances) {
-            int bestKnown = BestKnownResult.of(instanceName);
-
-
-            Path path = Paths.get("instances/", instanceName);
-            Instance instance = Instance.fromFile(path);
-
-            output.printf("%-8s %-5s %4d      ",instanceName, instance.numJobs +"x"+instance.numTasks, bestKnown);
-
-            for(int solverId = 0 ; solverId < solversToTest.size() ; solverId++) {
-                String solverName = solversToTest.get(solverId);
-                Solver solver = solvers.get(solverName);
-                long start = System.currentTimeMillis();
-                long deadline = System.currentTimeMillis() + solveTimeMs;
-                Result result = solver.solve(instance, deadline);
-                long runtime = System.currentTimeMillis() - start;
-
-                if(!result.schedule.isValid()) {
-                    System.err.println("ERROR: solver returned an invalid schedule");
-                    System.exit(1);
+	        for(String instanceName : instances) {
+	            int bestKnown = BestKnownResult.of(instanceName);
+	
+	
+	            Path path = Paths.get("instances/", instanceName);
+	            Instance instance = Instance.fromFile(path);
+	
+	            output.printf("%-8s %-5s %4d      ",instanceName, instance.numJobs +"x"+instance.numTasks, bestKnown);
+	
+	            for(int solverId = 0 ; solverId < solversToTest.size() ; solverId++) {
+                    String solverName = solversToTest.get(solverId);
+                    Solver solver = solvers.get(solverName);
+                    long start = System.currentTimeMillis();
+                    long deadline = System.currentTimeMillis() + solveTimeMs;
+                    Result result = solver.solve(instance, deadline);
+                    long runtime = System.currentTimeMillis() - start;
+	
+                    if(!result.schedule.isValid()) {
+                        System.err.println("ERROR: solver returned an invalid schedule");
+                        System.exit(1);
+                    }
+                    assert result.schedule.isValid();
+                    int makespan = result.schedule.makespan();
+                    float dist = 100f * (makespan - bestKnown) / (float) bestKnown;
+                    runtimes[solverId] += (float) runtime / (float) instances.size();
+                    distances[solverId] += dist / (float) instances.size();
+                    output.printf("%7d %8s %5.1f        ", runtime, makespan, dist);
+                    output.flush();
                 }
+                output.println();
 
-                assert result.schedule.isValid();
-                int makespan = result.schedule.makespan();
-                float dist = 100f * (makespan - bestKnown) / (float) bestKnown;
-                runtimes[solverId] += (float) runtime / (float) instances.size();
-                distances[solverId] += dist / (float) instances.size();
-
-                output.printf("%7d %8s %5.1f        ", runtime, makespan, dist);
-                output.flush();
             }
-            output.println();
 
-        }
-
-
-        output.printf("%-8s %-5s %4s      ", "AVG", "-", "-");
-        for(int solverId = 0 ; solverId < solversToTest.size() ; solverId++) {
-            output.printf("%7.1f %8s %5.1f        ", runtimes[solverId], "-", distances[solverId]);
-        }
+	        output.printf("%-8s %-5s %4s      ", "AVG", "-", "-");
+	        for(int solverId = 0 ; solverId < solversToTest.size() ; solverId++) {
+	            output.printf("%7.1f %8s %5.1f        ", runtimes[solverId], "-", distances[solverId]);
+	        }
 
 
 

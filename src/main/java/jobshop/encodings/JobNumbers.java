@@ -5,6 +5,8 @@ import jobshop.Instance;
 import jobshop.Schedule;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.stream.IntStream;
 
 /** Représentation par numéro de job. */
 public class JobNumbers extends Encoding {
@@ -12,7 +14,7 @@ public class JobNumbers extends Encoding {
     /** A numJobs * numTasks array containing the representation by job numbers. */
     public final int[] jobs;
 
-    /** In case the encoding is only partially filled, indicates the index of first
+    /** In case the encoding is only partially filled, indicates the index of the first
      * element of `jobs` that has not been set yet. */
     public int nextToSet = 0;
 
@@ -22,7 +24,32 @@ public class JobNumbers extends Encoding {
         jobs = new int[instance.numJobs * instance.numMachines];
         Arrays.fill(jobs, -1);
     }
+    
+    public JobNumbers(Schedule schedule) {
+        super(schedule.pb);
 
+        this.jobs = new int[instance.numJobs * instance.numTasks];
+
+        // for each job indicates which is the next task to be scheduled
+        int[] nextOnJob = new int[instance.numJobs];
+
+        while(Arrays.stream(nextOnJob).anyMatch(t -> t < instance.numTasks)) {
+            Task next = IntStream
+                    // for all jobs numbers
+                    .range(0, instance.numJobs)
+                    // build the next task for this job
+                    .mapToObj(j -> new Task(j, nextOnJob[j]))
+                    // only keep valid tasks (some jobs have no task left to be executed)
+                    .filter(t -> t.task < instance.numTasks)
+                    // select the task with the earliest execution time
+                    .min(Comparator.comparing(t -> schedule.startTime(t.job, t.task)))
+                    .get();
+
+            this.jobs[nextToSet++] = next.job;
+            nextOnJob[next.job] += 1;
+        }
+    }
+    
     @Override
     public Schedule toSchedule() {
         // time at which each machine is going to be freed
@@ -48,5 +75,30 @@ public class JobNumbers extends Encoding {
         }
 
         return new Schedule(instance, startTimes);
+    }
+
+    public JobNumbers fromSchedule (Schedule s) {
+    	JobNumbers res= new JobNumbers(s.pb);
+    	int[] nextToSetJobs = new int[res.instance.numJobs];
+    	int best;
+    	int jobRestant= res.instance.numJobs* res.instance.numTasks;
+    	while(jobRestant>0) {
+    		best=-1;
+    		for(int i=0;i<res.instance.numJobs;i++) {
+    			if(nextToSetJobs[i]< res.instance.numTasks) {
+    				if(best==-1 || s.startTime(best, nextToSetJobs[best])>s.startTime(i, nextToSetJobs[i])) {
+    					best=i;
+    				}
+    			}
+    			res.jobs[res.nextToSet++]=best;
+    			nextToSetJobs[best]++;
+                jobRestant--;
+    		}
+    	}
+    	return res;
+    }
+    @Override
+    public String toString() {
+        return Arrays.toString(Arrays.copyOfRange(jobs,0, nextToSet));
     }
 }
