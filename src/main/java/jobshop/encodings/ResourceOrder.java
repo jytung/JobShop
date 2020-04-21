@@ -125,33 +125,48 @@ public class ResourceOrder extends Encoding {
         return new Schedule(instance, startTimes);
     }
 	
-	public ResourceOrder fromSchedule(Schedule s) {
-		ResourceOrder res = new ResourceOrder(s.pb);
-		int machine;
-		Task best[] = new Task[res.instance.numMachines];
-		while(res.nextToSet[0]< res.instance.numJobs) {
-			Arrays.fill(best,null);
-			for(int i=0;i<res.instance.numJobs;i++) {
-				for(int j=0;j<res.instance.numTasks;j++) {
-					machine=res.instance.machine(i,j);
-					if(res.nextToSet[machine]==0||s.startTime(res.resource[machine][res.nextToSet[machine]-1].job, res.resource[machine][res.nextToSet[machine]-1].task) <s.startTime(i, j)
-							&& s.startTime(best[machine].job, best[machine].task) > s.startTime(i, j)) {
-						best[machine] = new Task(i, j);
-					}
-				}
-				for(int i1=0;i1<res.instance.numMachines;i1++) {
-					res.resource[i1][res.nextToSet[i1]++]=best[i1];
-				}
-			}
-		}
-		return res;
-	}
+//	public ResourceOrder fromSchedule(Schedule s) {
+//		ResourceOrder res = new ResourceOrder(s.pb);
+//		int machine;
+//		Task best[] = new Task[res.instance.numMachines];
+//		while(res.nextToSet[0]< res.instance.numJobs) {
+//			Arrays.fill(best,null);
+//			for(int i=0;i<res.instance.numJobs;i++) {
+//				for(int j=0;j<res.instance.numTasks;j++) {
+//					machine=res.instance.machine(i,j);
+//					if(res.nextToSet[machine]==0||s.startTime(res.resource[machine][res.nextToSet[machine]-1].job, res.resource[machine][res.nextToSet[machine]-1].task) <s.startTime(i, j)
+//							&& s.startTime(best[machine].job, best[machine].task) > s.startTime(i, j)) {
+//						best[machine] = new Task(i, j);
+//					}
+//				}
+//				for(int i1=0;i1<res.instance.numMachines;i1++) {
+//					res.resource[i1][res.nextToSet[i1]++]=best[i1];
+//				}
+//			}
+//		}
+//		return res;
+//	}
 
     /** Creates an exact copy of this resource order. */
     public ResourceOrder copy() {
         return new ResourceOrder(this.toSchedule());
     }
 
+    //find index of the task with the given machine
+    public int find(int machine, Task task) {
+    	int index=0;
+    	int found=0;
+    	while(found==0) {
+    		if(this.resource[machine][index].equals(task)) {
+    			//System.out.println("FOUND, index ="+index);
+    			found=1;
+    			return index;
+    		}else 
+    			index++;
+    	}
+    	//System.out.println("NOT FOUND");
+    	return -1; 
+    }
     @Override
     public String toString()
     {
