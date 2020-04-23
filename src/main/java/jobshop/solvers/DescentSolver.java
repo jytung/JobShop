@@ -85,7 +85,7 @@ public class DescentSolver implements Solver {
     public Result solve(Instance instance, long deadline) {
     	//TODO
     	//Initialisation the initial solution with  SPT
-    	GreedySolver glutonne= new GreedySolver(GreedySolver.Priority.SPT);
+    	GreedySolver glutonne= new GreedySolver(GreedySolver.Priority.EST_LRPT);
     	Schedule s= glutonne.solve(instance, deadline).schedule;
     	ResourceOrder order = new ResourceOrder(s);
 //    	System.out.println();
@@ -173,7 +173,6 @@ public class DescentSolver implements Solver {
     	}
     	//System.out.println(res.size());
     	return res;
-    		//throw new UnsupportedOperationException();
     }
 
 }
