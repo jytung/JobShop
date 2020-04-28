@@ -1,6 +1,5 @@
 package jobshop.encodings;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -158,13 +157,11 @@ public class ResourceOrder extends Encoding {
     	int found=0;
     	while(found==0) {
     		if(this.resource[machine][index].equals(task)) {
-    			//System.out.println("FOUND, index ="+index);
     			found=1;
     			return index;
     		}else 
     			index++;
     	}
-    	//System.out.println("NOT FOUND");
     	return -1; 
     }
     @Override

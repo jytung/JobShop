@@ -6,10 +6,8 @@ import jobshop.Schedule;
 import jobshop.Solver;
 import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
-import jobshop.solvers.DescentSolver.Block;
 
-import java.io.IOException;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -78,6 +76,13 @@ public class DescentSolver implements Solver {
             order.resource[this.machine][this.t1]= order.resource[this.machine][this.t2];
             order.resource[this.machine][this.t2]= tmp;
         }
+        
+        public List<Task> getTasksfromSwap(ResourceOrder order) {
+            List<Task> tasks = new ArrayList<Task>(2);
+            tasks.add(order.resource[this.machine][this.t1]);
+            tasks.add(order.resource[this.machine][this.t2]);
+            return tasks;
+        }
     }
 
 
@@ -87,34 +92,41 @@ public class DescentSolver implements Solver {
     	//Initialisation the initial solution with  SPT
     	GreedySolver glutonne= new GreedySolver(GreedySolver.Priority.EST_LRPT);
     	Schedule s= glutonne.solve(instance, deadline).schedule;
-    	ResourceOrder order = new ResourceOrder(s);
-//    	System.out.println();
-//    	System.out.println(order.toString());
     	Schedule best=s;
-    	//Exploration des vosinages successifs
-    	List<Block> criticalPathBlock = blocksOfCriticalPath(order);
-    	int bestDuration= order.toSchedule().makespan();
-    	//for each block of the critical path,find its neighbor
-    	for (int i=0;i<criticalPathBlock.size();i++) {
-    		Block block=criticalPathBlock.get(i);
-    		List<Swap> neighbor= neighbors(block);
-    		//for each neighbor, apply change on resource order
-    		for(int n=0;n<neighbor.size();n++) {
-    			ResourceOrder cp= order.copy();
-    			Swap swap= neighbor.get(n);
-    			swap.applyOn(cp);
-    			int duration= cp.toSchedule().makespan();
-    			if(duration<bestDuration) {
-    				bestDuration=duration;
-    				best= cp.toSchedule();
-    			}
-    		}
+    	
+    	ResourceOrder currentOrder = new ResourceOrder(s);
+    	int currentDuration= currentOrder.toSchedule().makespan();
+    	
+    	ResourceOrder bestOrder = currentOrder.copy();
+    	int bestDuration=currentDuration;
+    	
+    	int improvement = 1;
+    	while (deadline - System.currentTimeMillis() > 1 &&  improvement == 1 ) {
+    		List<Block> criticalPathBlock = blocksOfCriticalPath(currentOrder);
+    		//for each block of the critical path,find its neighbor
+        	for (Block block: criticalPathBlock) {
+        		List<Swap> neighbor= neighbors(block);
+        		//for each neighbor, apply change on resource order
+        		for(Swap swap: neighbor) {
+        			ResourceOrder cp= new ResourceOrder(best);
+        			swap.applyOn(cp);
+        			int duration= cp.toSchedule().makespan();
+    				if(duration<bestDuration) {
+    					bestDuration=duration;
+            			best= cp.toSchedule() ;
+            			bestOrder= currentOrder.copy(); 
+            			improvement=1;
+            		}
+            		else improvement=0;
+        		}
+        	}
+        	currentOrder=  bestOrder.copy();
     	}
 		return new Result(instance, best, Result.ExitCause.Timeout);
     }
 
     /** Returns a list of all blocks of the critical path. */
-    List<Block> blocksOfCriticalPath(ResourceOrder order) {
+    static List<Block> blocksOfCriticalPath(ResourceOrder order) {
     	List<Task> criticalPath= order.toSchedule().criticalPath();
 //    	System.out.println(criticalPath.toString());
     	List<Block> res=new LinkedList<Block>();
@@ -125,7 +137,7 @@ public class DescentSolver implements Solver {
     		if(order.instance.machine(criticalPath.get(i))==currentMachine) {
     			end++;
     		}
-    		else {
+    		else{
     			if(end>start){
     				//before start setting up the next block, add the previous block into the list
         			Block newBlock= new Block(currentMachine,start,end);
@@ -140,7 +152,7 @@ public class DescentSolver implements Solver {
         	}
     	}
     	//the last task of critical path
-    	if(order.instance.machine(criticalPath.get(criticalPath.size()-1))==currentMachine) {
+    	if(order.instance.machine(criticalPath.get(criticalPath.size()-1))==currentMachine && start!=end) {
     		Block newBlock= new Block(currentMachine,start,end);
 			res.add(newBlock);
 //			System.out.println("------------res-----------");
@@ -151,19 +163,12 @@ public class DescentSolver implements Solver {
     
     
     /** For a given block, return the possible swaps for the Nowicki and Smutnicki neighborhood */
-    List<Swap> neighbors(Block block) {
+    static List<Swap> neighbors(Block block) {
     	List<Swap> res= new LinkedList<Swap>();
-    	int size= block.lastTask-block.firstTask;
-//    	for (int i=0;i<size;i++) {
-//    		Swap s=new Swap(block.machine,block.firstTask+i,block.firstTask+i+1);
-//    		res.add(s);
-//    	}
-//    	System.out.println(res.size());
-    	if(size==1) {
+    	int size= block.lastTask-block.firstTask+1;
+    	if(size==2) {
     		Swap s=new Swap(block.machine,block.firstTask,block.lastTask);
     		res.add(s);
-    	}else if(size==0) {
-    		//System.out.println("unable to swipe");
     	}
     	else {
     		Swap s=new Swap(block.machine,block.firstTask,block.firstTask+1);
@@ -171,7 +176,6 @@ public class DescentSolver implements Solver {
     		Swap s1=new Swap(block.machine,block.lastTask,block.lastTask-1);
     		res.add(s1);
     	}
-    	//System.out.println(res.size());
     	return res;
     }
 

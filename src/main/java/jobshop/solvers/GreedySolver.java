@@ -4,7 +4,6 @@ import jobshop.Instance;
 import jobshop.Result;
 import jobshop.Schedule;
 import jobshop.Solver;
-import jobshop.encodings.JobNumbers;
 import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
 
@@ -91,10 +90,7 @@ public class GreedySolver implements Solver {
 					remainingTime[job]+= instance.duration(job,task);
 				}
 			}
-			/*
-			System.out.println("------------remainingTime-----------");
-			System.out.println(Arrays.toString(remainingTime));
-			*/
+	
 			while(remainingTask>0) {
 				//recherche de la duree restant maximal de tous les jobs
 				int max=-1;
@@ -107,26 +103,16 @@ public class GreedySolver implements Solver {
 						task=taskAvailable[j];
 					}
 				}
-				//System.out.println("max: "+ max);
+				
 				//placer la tache le plus court dans la representation ResourceOrder
 				Task best= new Task(job,task);
 				sol.resource[instance.machine(best)][++sol.nextToSet[instance.machine(best)]]=best;
 				remainingTask--;
-				/*
-				System.out.println("------------taskAvailable-----------");
-				System.out.println(Arrays.toString(taskAvailable));
-				System.out.println("------------task choisi-----------");
-				System.out.println(job+ " , "+ task);
-				System.out.println("------------Resource-----------");
-				System.out.println(sol.toString());
-				*/
+				
 				//maj de tache realisable
 				remainingTime[job]-=instance.duration(job,task);
 				taskAvailable[job]++;
-				/*
-				System.out.println("------------remainingTime-----------");
-				System.out.println(Arrays.toString(remainingTime));
-				*/
+				
 			}
 			break;
 		case SRPT:
@@ -165,17 +151,12 @@ public class GreedySolver implements Solver {
 			//la restriction aux tâches pouvant commencer au plus tôt.
 			
 			// for each available task, its start time
-			int nextFreeTimeJob [] = new int[instance.numJobs];
+			int[] nextFreeTimeJob  = new int[instance.numJobs];
 			// time at which each machine is going to be freed
 	        int[] nextFreeTimeResource = new int[instance.numMachines];
-//	        System.out.println(" ");
+
 			while(remainingTask>0) {
-//				System.out.println("------------nextFreeTimeResource-----------");
-//				System.out.println(Arrays.toString(nextFreeTimeResource));
-//				System.out.println("------------taskAvailable-----------");
-//				System.out.println(Arrays.toString(taskAvailable));
-//				System.out.println("------------nextFreeTimeJob-----------");
-//				System.out.println(Arrays.toString(nextFreeTimeJob));
+				
 				//recherche de la duree minimal de tous les taskAvailable
 				int min =100000;
 				int job=-1;
@@ -188,6 +169,7 @@ public class GreedySolver implements Solver {
 						job=j;
 						task=taskAvailable[j];
 					}
+					
 					//si on a deux taches qui a le meme start time on choisit la duree la plus courte(spt)
 					else if(taskAvailable[j]<instance.numTasks && nextFreeTimeJob[j]==min) {
 						if(instance.duration(j,taskAvailable[j])<instance.duration(job,taskAvailable[job])) {
@@ -202,10 +184,6 @@ public class GreedySolver implements Solver {
 				Task best= new Task(job,task);
 				sol.resource[instance.machine(best)][++sol.nextToSet[instance.machine(best)]]=best;
 				remainingTask--;
-//				System.out.println("------------task choisi-----------");
-//				System.out.println(job+ " , "+ task);
-//				System.out.println("------------Resource-----------");
-//				System.out.println(sol.toString());
 				
 				//maj de tache realisable
 				taskAvailable[job]++;
@@ -259,19 +237,6 @@ public class GreedySolver implements Solver {
 				sol.resource[instance.machine(best)][++sol.nextToSet[instance.machine(best)]]=best;
 				remainingTask--;
 				
-				//maj de startTimes 
-//				for (int j=0;j<instance.numJobs;j++) {
-//					//si le job n'est pas encore termine
-//					if(taskAvailable[j]<instance.numTasks){
-//						int t = taskAvailable[j];
-//						// earliest start time for this task
-//						int est = t == 0 ? 0 : startTimes1[j][t-1] + instance.duration(j, t-1);
-//					    est = Math.max(est, nextFreeTimeResource1[instance.machine(j,t)]);
-//					    startTimes1[j][t] = est;
-//					    //nextFreeTimeResource[instance.machine(j,t)] = est+ instance.duration(j, t) ;
-//					    nextTask[j] = t + 1;
-//					}
-//				}
 				//maj de tache realisable
 				taskAvailable[job]++;
 				nextFreeTimeResource1[instance.machine(job,task)] +=  instance.duration(job, task) ;
@@ -285,8 +250,13 @@ public class GreedySolver implements Solver {
 		default:
 			break;
 		}
+		
+		Result.ExitCause exitCause = Result.ExitCause.Blocked;
+        if(System.currentTimeMillis() >= deadline) {
+            exitCause = Result.ExitCause.Timeout;
+        }
 		Schedule best =sol.toSchedule();
-		return new Result(instance, best, Result.ExitCause.Timeout);
+		return new Result(instance, best, exitCause);
 	}
 
 
