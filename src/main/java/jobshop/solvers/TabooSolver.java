@@ -30,7 +30,6 @@ public class TabooSolver  implements Solver {
 
 		while(k<=maxIter && deadline - System.currentTimeMillis() > 1) {
 			k++;
-			Swap bestNeighborSwap =null;
 			ResourceOrder bestNeighborOrder = null;
 			int bestNeighborDuration = Integer.MAX_VALUE;
 			int index1 =-1;
@@ -51,7 +50,6 @@ public class TabooSolver  implements Solver {
 					if((duration <= bestDuration) || ((duration <=bestNeighborDuration) && (sTaboo[index1][index2] <= k))){
 						bestNeighborDuration=duration;
 						bestNeighborOrder= currentNeighborOrder; 
-						bestNeighborSwap=swap;
 					}
 				}
 			}
@@ -72,7 +70,6 @@ public class TabooSolver  implements Solver {
 			}
 		}
 			
-		
 		
 		Result.ExitCause exitCause = Result.ExitCause.Blocked;
         if(System.currentTimeMillis() >= deadline) {
