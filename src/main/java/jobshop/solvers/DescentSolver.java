@@ -39,6 +39,14 @@ public class DescentSolver implements Solver {
             this.firstTask = firstTask;
             this.lastTask = lastTask;
         }
+        
+        Block(ResourceOrder order, int machine, int taskCount, Task firstTask) {
+            int firstTaskIndexInResourceQueue = order.find(machine,firstTask);
+            int lastTaskIndexInResourceQueue = firstTaskIndexInResourceQueue + taskCount - 1;
+            this.machine = machine;
+            this.firstTask = firstTaskIndexInResourceQueue;
+            this.lastTask = lastTaskIndexInResourceQueue;
+        }
     }
 
     /**
@@ -164,19 +172,22 @@ public class DescentSolver implements Solver {
     
     /** For a given block, return the possible swaps for the Nowicki and Smutnicki neighborhood */
     static List<Swap> neighbors(Block block) {
-    	List<Swap> res= new LinkedList<Swap>();
+    	List<Swap> res;
     	int size= block.lastTask-block.firstTask+1;
     	if(size==2) {
+    		res = new ArrayList<Swap>(1);
     		Swap s=new Swap(block.machine,block.firstTask,block.lastTask);
     		res.add(s);
     	}
     	else {
+    		res = new ArrayList<Swap>(2);
     		Swap s=new Swap(block.machine,block.firstTask,block.firstTask+1);
     		res.add(s);
-    		Swap s1=new Swap(block.machine,block.lastTask,block.lastTask-1);
+    		Swap s1=new Swap(block.machine,block.lastTask-1,block.lastTask);
     		res.add(s1);
     	}
     	return res;
     }
+
 
 }
