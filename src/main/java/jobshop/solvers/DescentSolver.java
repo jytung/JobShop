@@ -96,7 +96,6 @@ public class DescentSolver implements Solver {
 
     @Override
     public Result solve(Instance instance, long deadline) {
-    	//TODO
     	//Initialisation the initial solution with  SPT
     	GreedySolver glutonne= new GreedySolver(GreedySolver.Priority.EST_LRPT);
     	Schedule s= glutonne.solve(instance, deadline).schedule;
@@ -136,7 +135,6 @@ public class DescentSolver implements Solver {
     /** Returns a list of all blocks of the critical path. */
     static List<Block> blocksOfCriticalPath(ResourceOrder order) {
     	List<Task> criticalPath= order.toSchedule().criticalPath();
-//    	System.out.println(criticalPath.toString());
     	List<Block> res=new LinkedList<Block>();
     	int currentMachine=order.instance.machine(criticalPath.get(0));
     	int start=order.find(currentMachine,criticalPath.get(0));
@@ -150,8 +148,6 @@ public class DescentSolver implements Solver {
     				//before start setting up the next block, add the previous block into the list
         			Block newBlock= new Block(currentMachine,start,end);
         			res.add(newBlock);
-//    				System.out.println("------------res-----------");
-//    				for(int i1 = 0; i1 < res.size(); i1++) System.out.println("first "+ res.get(i1).firstTask+" ,last "+res.get(i1).lastTask+ ",machine "+res.get(i1).machine );
         			}
         			//setting up the new task of the block
         			currentMachine=order.instance.machine(criticalPath.get(i));
@@ -163,8 +159,6 @@ public class DescentSolver implements Solver {
     	if(order.instance.machine(criticalPath.get(criticalPath.size()-1))==currentMachine && start!=end) {
     		Block newBlock= new Block(currentMachine,start,end);
 			res.add(newBlock);
-//			System.out.println("------------res-----------");
-//			for(int i1 = 0; i1 < res.size(); i1++) System.out.println("first "+ res.get(i1).firstTask+" ,last "+res.get(i1).lastTask+ ",machine "+res.get(i1).machine );
     	}
     	return res;
     }

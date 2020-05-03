@@ -13,24 +13,19 @@ import jobshop.solvers.DescentSolver.*;
 public class TabooSolver  implements Solver {
 
 	final int dureeTaboo = 10;
-	final int maxIter =5000;
+	final int maxIter =1000;
+	final int maxIterWithoutImprovement= 1000;
 
-	private static boolean isTaboo(int[][] sTaboo, Swap swap, ResourceOrder solution, int k) {
-        Task t1 = swap.getTasksfromSwap(solution).get(0);
-        Task t2 = swap.getTasksfromSwap(solution).get(1);
-        return k <
-        		sTaboo
-                        [t1.job * solution.instance.numTasks + t1.task]
-                        [t2.job * solution.instance.numTasks + t2.task];
+	private static boolean isTaboo(int[][] sTaboo, Swap swap, ResourceOrder order, int k) {
+        Task t1 = swap.getTasksfromSwap(order).get(0);
+        Task t2 = swap.getTasksfromSwap(order).get(1);
+        return k <sTaboo[t1.job * order.instance.numTasks + t1.task][t2.job * order.instance.numTasks + t2.task];
     }
 
-    private void setTaboo(int[][] sTaboo, Swap swap, ResourceOrder solution, int k) {
-    	Task t1 = swap.getTasksfromSwap(solution).get(0);
-        Task t2 = swap.getTasksfromSwap(solution).get(1);
-        sTaboo
-                [t2.job * solution.instance.numTasks + t2.task]
-                [t1.job * solution.instance.numTasks + t1.task]
-                = dureeTaboo + k;
+    private void setTaboo(int[][] sTaboo, Swap swap, ResourceOrder order, int k) {
+    	Task t1 = swap.getTasksfromSwap(order).get(0);
+        Task t2 = swap.getTasksfromSwap(order).get(1);
+        sTaboo[t2.job * order.instance.numTasks + t2.task][t1.job * order.instance.numTasks + t1.task]= dureeTaboo + k;
     }
 
     @Override
@@ -48,9 +43,11 @@ public class TabooSolver  implements Solver {
 
     	int[][] sTaboo= new int[instance.numTasks*instance.numJobs][instance.numTasks*instance.numJobs];
     	int k=0;
+    	int improve=0;
 
-    	while(k<=maxIter && deadline - System.currentTimeMillis() > 1) {
+    	while(k<=maxIter && deadline - System.currentTimeMillis() > 1 && improve<=maxIterWithoutImprovement) {
     		k++;
+    		improve++;
     		ResourceOrder bestNeighborOrder = null;
     		Swap bestNeighborSwap= null;
     		int bestNeighborDuration = Integer.MAX_VALUE;
@@ -69,6 +66,7 @@ public class TabooSolver  implements Solver {
     						bestNeighborDuration=duration;
     						bestNeighborOrder= currentNeighborOrder; 
     						bestNeighborSwap= swap;
+    						if(duration < bestDuration) improve=0;
     					}
     				}
     			}

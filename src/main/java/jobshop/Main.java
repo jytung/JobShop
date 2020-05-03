@@ -31,6 +31,9 @@ public class Main {
         solvers.put("est_spt", new GreedySolver(GreedySolver.Priority.EST_SPT));
         solvers.put("descent", new DescentSolver());
         solvers.put("taboo", new TabooSolver());
+        solvers.put("randomGreedy", new  GreedySolver(GreedySolver.Priority.RANDOM));
+        solvers.put("multiDescent", new  DescentMultiStart());
+        solvers.put("methodeASeuil", new  TresholdAccepting());
     }
 
 

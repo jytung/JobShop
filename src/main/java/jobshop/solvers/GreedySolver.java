@@ -8,23 +8,46 @@ import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class GreedySolver implements Solver {
 	
 	public enum Priority {
-        SPT,LPT, SRPT,LRPT,EST_SPT, EST_LRPT
+        SPT,LPT,SRPT,LRPT,EST_SPT,EST_LRPT,RANDOM
     }
 	
 	Priority prio;
 	
-	//constructor
 	public GreedySolver(Priority prio) {
-		this.prio=prio;
+		if(prio!=GreedySolver.Priority.RANDOM) this.prio=prio;
+		else {
+			Random objGenerator = new Random();
+			int random = objGenerator.nextInt(5);
+			switch(random) {
+			case 0: //SPT
+				this.prio=GreedySolver.Priority.SPT;
+				break;
+			case 1: //LPT
+				this.prio=GreedySolver.Priority.LPT;
+				break;
+			case 2: //SRPT
+				this.prio=GreedySolver.Priority.SRPT;
+				break;
+			case 3: //LRPT
+				this.prio=GreedySolver.Priority.LRPT;
+				break;
+			case 4: //EST-SPT
+				this.prio=GreedySolver.Priority.EST_SPT;
+				break;
+			case 5: //EST-LRPT
+				this.prio=GreedySolver.Priority.EST_LRPT;
+				break;
+			}
+		}
 	}
 	
 	@Override
 	public Result solve(Instance instance, long deadline) {
-		
 		// Initialization -- placer tous les premiers task de tous les jobs dans taskAvailable
 		int[] taskAvailable = new int[instance.numJobs];
 		Arrays.fill(taskAvailable,0);
