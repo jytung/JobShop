@@ -9,13 +9,36 @@ import jobshop.Solver;
 import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
 import jobshop.solvers.DescentSolver.*;
+import jobshop.solvers.GreedySolver.Priority;
 
 public class TabooSolver  implements Solver {
 
-	final int dureeTaboo = 10;
-	final int maxIter =1000;
-	final int maxIterWithoutImprovement= 1000;
+	public int dureeTaboo;
+	public int maxIter ;
+	public int maxIterWithoutImprovement= 30;
 
+	Priority prio;
+	
+	public TabooSolver(Priority prio) {
+		this.prio=prio;
+		this.dureeTaboo= 10;
+		this.maxIter=1000;
+	}
+	
+	public TabooSolver(Priority prio, int dureeTaboo, int maxIter) {
+		this.prio=prio;
+		this.dureeTaboo= dureeTaboo;
+		this.maxIter=maxIter;
+	}
+	
+	public TabooSolver(Priority prio, int improv) {
+		this.prio=prio;
+		this.maxIterWithoutImprovement=improv;
+		this.dureeTaboo= 10;
+		this.maxIter=1000;
+	}
+	
+	
 	private static boolean isTaboo(int[][] sTaboo, Swap swap, ResourceOrder order, int k) {
         Task t1 = swap.getTasksfromSwap(order).get(0);
         Task t2 = swap.getTasksfromSwap(order).get(1);
@@ -39,7 +62,6 @@ public class TabooSolver  implements Solver {
     	int bestDuration=bestOrder.toSchedule().makespan();
 
     	ResourceOrder currentOrder = bestOrder;
-    	int currentDuration= bestDuration;
 
     	int[][] sTaboo= new int[instance.numTasks*instance.numJobs][instance.numTasks*instance.numJobs];
     	int k=0;
@@ -57,28 +79,22 @@ public class TabooSolver  implements Solver {
     			List<Swap> neighbor= DescentSolver.neighbors(block);
     			//for each neighbor, apply change on resource order
     			for(Swap swap: neighbor) {
-    				if(!isTaboo(sTaboo, swap, currentOrder, k)) {
-    					ResourceOrder currentNeighborOrder = currentOrder.copy();
-    					swap.applyOn(currentNeighborOrder);
-    					int duration= currentNeighborOrder.toSchedule().makespan();
-    					//find the best not taboo neighbor
-    					if((duration < bestDuration) || ((duration < bestNeighborDuration) &&  !isTaboo(sTaboo,swap, currentOrder, k))){
-    						bestNeighborDuration=duration;
-    						bestNeighborOrder= currentNeighborOrder; 
-    						bestNeighborSwap= swap;
-    						if(duration < bestDuration) improve=0;
-    					}
+    				ResourceOrder currentNeighborOrder = currentOrder.copy();
+    				swap.applyOn(currentNeighborOrder);
+    				int duration= currentNeighborOrder.toSchedule().makespan();
+    				//find the best not taboo neighbor
+    				if((duration < bestDuration) || ((duration < bestNeighborDuration) &&  !isTaboo(sTaboo,swap, currentOrder, k))){
+    					bestNeighborDuration=duration;
+    					bestNeighborOrder= currentNeighborOrder; 
+    					bestNeighborSwap= swap;
+    					if(duration < bestDuration) improve=0;
     				}
     			}
     		}
 
-    		if(bestNeighborOrder == null) {
-    			bestNeighborDuration = currentDuration;
-    			bestNeighborOrder = currentOrder;
-    		} else {
+    		if(bestNeighborOrder != null) {
     			setTaboo(sTaboo, bestNeighborSwap, currentOrder, k);
     			currentOrder=bestNeighborOrder;
-    			currentDuration= bestNeighborDuration;
 
     			if(bestNeighborDuration < bestDuration) {
     				bestOrder = bestNeighborOrder;

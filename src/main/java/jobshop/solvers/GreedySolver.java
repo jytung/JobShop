@@ -22,7 +22,7 @@ public class GreedySolver implements Solver {
 		if(prio!=GreedySolver.Priority.RANDOM) this.prio=prio;
 		else {
 			Random objGenerator = new Random();
-			int random = objGenerator.nextInt(5);
+			int random = objGenerator.nextInt(6);
 			switch(random) {
 			case 0: //SPT
 				this.prio=GreedySolver.Priority.SPT;

@@ -6,6 +6,7 @@ import jobshop.Schedule;
 import jobshop.Solver;
 import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
+import jobshop.solvers.GreedySolver.Priority;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -26,6 +27,13 @@ public class DescentSolver implements Solver {
      * Represent the task sequence : [(0,2) (2,1)]
      *
      * */
+	
+	Priority prio;
+	
+	public DescentSolver(Priority prio) {
+		this.prio=prio;
+	}
+	
     static class Block {
         /** machine on which the block is identified */
         final int machine;
@@ -41,11 +49,11 @@ public class DescentSolver implements Solver {
         }
         
         Block(ResourceOrder order, int machine, int taskCount, Task firstTask) {
-            int firstTaskIndexInResourceQueue = order.find(machine,firstTask);
-            int lastTaskIndexInResourceQueue = firstTaskIndexInResourceQueue + taskCount - 1;
+            int firstTaskIndex = order.find(machine,firstTask);
+            int lastTaskIndex = firstTaskIndex + taskCount - 1;
             this.machine = machine;
-            this.firstTask = firstTaskIndexInResourceQueue;
-            this.lastTask = lastTaskIndexInResourceQueue;
+            this.firstTask = firstTaskIndex;
+            this.lastTask = lastTaskIndex;
         }
     }
 
@@ -97,7 +105,7 @@ public class DescentSolver implements Solver {
     @Override
     public Result solve(Instance instance, long deadline) {
     	//Initialisation the initial solution with  SPT
-    	GreedySolver glutonne= new GreedySolver(GreedySolver.Priority.EST_LRPT);
+    	GreedySolver glutonne= new GreedySolver(this.prio);
     	Schedule s= glutonne.solve(instance, deadline).schedule;
     	Schedule best=s;
     	

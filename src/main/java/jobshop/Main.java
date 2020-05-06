@@ -23,17 +23,40 @@ public class Main {
         solvers = new HashMap<>();
         solvers.put("basic", new BasicSolver());
         solvers.put("random", new RandomSolver());
+        
         solvers.put("spt", new GreedySolver(GreedySolver.Priority.SPT));
         solvers.put("lpt", new GreedySolver(GreedySolver.Priority.LPT));
         solvers.put("srpt", new GreedySolver(GreedySolver.Priority.SRPT));
         solvers.put("lrpt", new GreedySolver(GreedySolver.Priority.LRPT));
-        solvers.put("est_lrpt", new GreedySolver(GreedySolver.Priority.EST_LRPT));
-        solvers.put("est_spt", new GreedySolver(GreedySolver.Priority.EST_SPT));
-        solvers.put("descent", new DescentSolver());
-        solvers.put("taboo", new TabooSolver());
+        solvers.put("est-lrpt", new GreedySolver(GreedySolver.Priority.EST_LRPT));
+        solvers.put("est-spt", new GreedySolver(GreedySolver.Priority.EST_SPT));
+        
+        solvers.put("descent-spt", new DescentSolver(GreedySolver.Priority.SPT));
+        solvers.put("descent-lpt", new DescentSolver(GreedySolver.Priority.LPT));
+        solvers.put("descent-srpt", new DescentSolver(GreedySolver.Priority.SRPT));
+        solvers.put("descent-lrpt", new DescentSolver(GreedySolver.Priority.LRPT));
+        solvers.put("descent-est-lrpt", new DescentSolver(GreedySolver.Priority.EST_LRPT));
+        solvers.put("descent-est-spt", new DescentSolver(GreedySolver.Priority.EST_SPT));
+        solvers.put("descent-multi", new  DescentMultiStart(GreedySolver.Priority.EST_LRPT));
+        
+        solvers.put("taboo-spt", new TabooSolver(GreedySolver.Priority.SPT));
+        solvers.put("taboo-lpt", new TabooSolver(GreedySolver.Priority.LPT));
+        solvers.put("taboo-srpt", new TabooSolver(GreedySolver.Priority.SRPT));
+        solvers.put("taboo-lrpt", new TabooSolver(GreedySolver.Priority.LRPT));
+        solvers.put("taboo-est-spt", new TabooSolver(GreedySolver.Priority.EST_SPT));
+        solvers.put("taboo-est-lrpt", new TabooSolver(GreedySolver.Priority.EST_LRPT));
+        
+        solvers.put("taboo1", new TabooSolver(GreedySolver.Priority.EST_LRPT,1));
+        solvers.put("taboo5", new TabooSolver(GreedySolver.Priority.EST_LRPT,5));
+        solvers.put("taboo10", new TabooSolver(GreedySolver.Priority.EST_LRPT,10));
+        solvers.put("taboo20", new TabooSolver(GreedySolver.Priority.EST_LRPT,20));
+        solvers.put("taboo100", new TabooSolver(GreedySolver.Priority.EST_LRPT,100));
+        solvers.put("taboo1000", new TabooSolver(GreedySolver.Priority.EST_LRPT,1000));
+
+        
         solvers.put("randomGreedy", new  GreedySolver(GreedySolver.Priority.RANDOM));
-        solvers.put("multiDescent", new  DescentMultiStart());
-        solvers.put("methodeASeuil", new  TresholdAccepting());
+        
+        solvers.put("methodeASeuil", new TresholdAccepting(GreedySolver.Priority.EST_LRPT));
     }
 
 

@@ -7,10 +7,15 @@ import jobshop.Instance;
 import jobshop.Result;
 import jobshop.Schedule;
 import jobshop.encodings.ResourceOrder;
+import jobshop.solvers.GreedySolver.Priority;
 
 public class DescentMultiStart extends DescentSolver{
 
-    public Result solveRandom(Instance instance, long deadline) {
+    public DescentMultiStart(Priority prio) {
+		super(prio);
+	}
+
+	public Result solveRandom(Instance instance, long deadline) {
     	//Initialisation the initial solution with  SPT
     	GreedySolver glutonne= new GreedySolver(GreedySolver.Priority.RANDOM);
     	Schedule s= glutonne.solve(instance, deadline).schedule;
